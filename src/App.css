@@ -20,7 +20,7 @@ body {
     text-align: center;
     background-color: black;
     color: white;
-    border: 1px solid blue;
+    border: 1px solid rgb(55, 183, 119);;
 
 }
 
@@ -35,7 +35,7 @@ body {
     border-radius: 50px;
     background: black;
     color: white;
-    border: 1px solid blue;
+    border: 1px solid rgb(55, 183, 119);
     font-size: 24px;
 }
 
@@ -46,7 +46,7 @@ body {
     align-items: center;
 }
 
-.timer-output {
+.time-remaining {
     font-size: larger;
     color: white;
     text-align: end;

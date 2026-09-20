@@ -1,10 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
-function Timer() {
-  return <></>;
-}
-
 function Seperator() {
   return <p className="seperator">|</p>;
 }
@@ -12,56 +8,147 @@ function Seperator() {
 type buttonArguments = {
   timerStarted: Boolean;
   setTimerStarted: React.Dispatch<React.SetStateAction<boolean>>;
+  process: () => void;
 };
 
-function Button({ timerStarted, setTimerStarted }: buttonArguments) {
+function PlayButton({ timerStarted, process }: buttonArguments) {
   const buttonText = timerStarted ? "Pause" : "Play";
 
   return (
-    <button
-      className="timer-button"
-      onClick={() => setTimerStarted(!timerStarted)}
-    >
+    <button className="timer-button" onClick={process}>
       {buttonText}
     </button>
   );
 }
 
+type timerInputElementArguments = {
+  type: string;
+  setSeconds: React.Dispatch<React.SetStateAction<string>>;
+  setMinutes: React.Dispatch<React.SetStateAction<string>>;
+  setHours: React.Dispatch<React.SetStateAction<string>>;
+};
+
+function TimerInputElement({
+  type,
+  setSeconds,
+  setMinutes,
+  setHours,
+}: timerInputElementArguments) {
+  function setDuration(e: React.ChangeEvent<HTMLInputElement>) {
+    const input = e.target.value;
+
+    switch (type) {
+      case "hh":
+        setHours(input);
+        break;
+      case "mm":
+        setMinutes(input);
+        break;
+      case "ss":
+        setSeconds(input);
+        break;
+      default:
+        break;
+    }
+  }
+
+  return (
+    <>
+      <input
+        className="timer-input-element"
+        onChange={setDuration}
+        maxLength={2}
+        placeholder="00"
+      />
+    </>
+  );
+}
+
 function App() {
-  const now = new Date();
   const [timerStarted, setTimerStarted] = useState(false);
-  let [count, setCount] = useState(0);
+
+  const [seconds, setSeconds] = useState("");
+  const [minutes, setMinutes] = useState("");
+  const [hours, setHours] = useState("");
+  const [totalSeconds, setTotalSeconds] = useState(0);
 
   useEffect(() => {
-    let intervalId: ReturnType<typeof setInterval> | undefined;
-
-    if (timerStarted) {
-      intervalId = setInterval(() => setCount((current) => current + 1), 1000);
+    if (!timerStarted) {
+      return;
     }
 
+    const intervalId = setInterval(() => {
+      setTotalSeconds((current) => {
+        if ( current <= 1) {
+          setTimerStarted(false);
+          return 0;
+        }
+
+        return current - 1;
+      });
+    }, 1000);
+
     return () => clearInterval(intervalId);
-  });
+  }, [timerStarted]);
+
+  function process() {
+    const totalSeconds = Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds);
+
+    setTotalSeconds(totalSeconds);
+    setTimerStarted(!timerStarted);
+  }
+
+  function secondsToDuration(totalSeconds: number) {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${hours.toString().padStart(2, "0")}:${minutes
+    .toString()
+    .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  }
 
   return (
     <div className="container">
       <div className="timer-input-row">
         {/* Hours */}
-        <input className="timer-input-element" maxLength={2} placeholder="00" />
+        <TimerInputElement
+          type="hh"
+          setSeconds={setSeconds}
+          setMinutes={setMinutes}
+          setHours={setHours}
+        />
 
         <Seperator />
 
         {/* Minutes */}
-        <input className="timer-input-element" maxLength={2} placeholder="00" />
+        <TimerInputElement
+          type="mm"
+          setSeconds={setSeconds}
+          setMinutes={setMinutes}
+          setHours={setHours}
+        />
 
         <Seperator />
 
         {/* Seconds */}
-        <input className="timer-input-element" maxLength={2} placeholder="00" />
+        <TimerInputElement
+          type="ss"
+          setSeconds={setSeconds}
+          setMinutes={setMinutes}
+          setHours={setHours}
+        />
 
-        <Button timerStarted={timerStarted} setTimerStarted={setTimerStarted} />
+        <PlayButton
+          timerStarted={timerStarted}
+          setTimerStarted={setTimerStarted}
+          process={process}
+        />
       </div>
 
-        <p className="timer-output">{count} {timerStarted}</p>
+      <p className="time-remaining">
+        {secondsToDuration(totalSeconds)}
+      </p>
     </div>
   );
 }
