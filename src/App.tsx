@@ -23,6 +23,7 @@ function PlayButton({ timerStarted, process }: buttonArguments) {
 
 type timerInputElementArguments = {
   type: string;
+  value: string;
   setSeconds: React.Dispatch<React.SetStateAction<string>>;
   setMinutes: React.Dispatch<React.SetStateAction<string>>;
   setHours: React.Dispatch<React.SetStateAction<string>>;
@@ -30,6 +31,7 @@ type timerInputElementArguments = {
 
 function TimerInputElement({
   type,
+  value,
   setSeconds,
   setMinutes,
   setHours,
@@ -56,6 +58,7 @@ function TimerInputElement({
     <>
       <input
         className="timer-input-element"
+        value={value}
         onChange={setDuration}
         maxLength={2}
         placeholder="00"
@@ -91,6 +94,14 @@ function App() {
     return () => clearInterval(intervalId);
   }, [timerStarted]);
 
+  function resetTimer() {
+    setHours('');
+    setMinutes('');
+    setSeconds('');
+    setTotalSeconds(0);
+    setTimerStarted(false);
+  }
+
   function process() {
     const totalSeconds = Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds);
 
@@ -114,6 +125,7 @@ function App() {
         {/* Hours */}
         <TimerInputElement
           type="hh"
+          value={hours}
           setSeconds={setSeconds}
           setMinutes={setMinutes}
           setHours={setHours}
@@ -124,6 +136,7 @@ function App() {
         {/* Minutes */}
         <TimerInputElement
           type="mm"
+          value={minutes}
           setSeconds={setSeconds}
           setMinutes={setMinutes}
           setHours={setHours}
@@ -134,6 +147,7 @@ function App() {
         {/* Seconds */}
         <TimerInputElement
           type="ss"
+          value={seconds}
           setSeconds={setSeconds}
           setMinutes={setMinutes}
           setHours={setHours}
@@ -144,6 +158,10 @@ function App() {
           setTimerStarted={setTimerStarted}
           process={process}
         />
+
+        <button className="timer-button" onClick={resetTimer}>
+          Reset
+        </button>
       </div>
 
       <p className="time-remaining">

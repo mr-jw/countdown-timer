@@ -37,6 +37,7 @@ body {
     color: white;
     border: 1px solid rgb(55, 183, 119);
     font-size: 24px;
+    margin: 0px 10px;
 }
 
 .timer-input-row {
