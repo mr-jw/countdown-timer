@@ -38,6 +38,11 @@ body {
     border: 1px solid rgb(55, 183, 119);
     font-size: 24px;
     margin: 0px 10px;
+    transition: border, 1.125;
+}
+
+.timer-button:hover {
+    border: 1px solid white;
 }
 
 .timer-input-row {
@@ -48,7 +53,7 @@ body {
 }
 
 .time-remaining {
-    font-size: larger;
+    font-size: 80px;
     color: white;
     text-align: end;
 }
