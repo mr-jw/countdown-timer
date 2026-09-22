@@ -5,13 +5,12 @@ function Seperator() {
   return <p className="seperator">|</p>;
 }
 
-type buttonArguments = {
-  timerStarted: Boolean;
-  setTimerStarted: React.Dispatch<React.SetStateAction<boolean>>;
+type PlayButtonProps = {
+  timerStarted: boolean;
   startTimer: () => void;
 };
 
-function PlayButton({ timerStarted, startTimer }: buttonArguments) {
+function PlayButton({ timerStarted, startTimer }: PlayButtonProps) {
   const buttonText = timerStarted ? "Stop" : "Start";
 
   return (
@@ -21,17 +20,14 @@ function PlayButton({ timerStarted, startTimer }: buttonArguments) {
   );
 }
 
-type timerInputElementArguments = {
+type TimerElementProps = {
   value: string;
-  setValue: React.Dispatch<React.SetStateAction<string>>;
+  onChange: (value: string) => void;
 };
 
-function TimerInputElement({
-  value,
-  setValue
-}: timerInputElementArguments) {
+function TimerElement({ value, onChange }: TimerElementProps) {
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setValue(e.target.value);
+    onChange(e.target.value);
   }
 
   return (
@@ -47,12 +43,44 @@ function TimerInputElement({
   );
 }
 
+type CircularCountdownProps = {
+  totalSeconds: number;
+  secondsRemaining: number;
+};
+
+function CircleCountdown( {totalSeconds, secondsRemaining}: CircularCountdownProps) {
+  const progressPercent = (totalSeconds - secondsRemaining) / totalSeconds;
+  const degrees = progressPercent * 360;
+
+   function secondsToDuration(totalSeconds: number) {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${hours.toString().padStart(2, "0")}:${minutes
+      .toString()
+      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  }
+
+  const timerEl = document.getElementById('timer'); 
+
+  if (timerEl !== null)
+    timerEl.style.background = `conic-gradient( #37b777 ${degrees}deg, #2c4338 ${degrees}deg)`;
+
+  return (
+    <div className="countdown-timer" id="timer">
+      <div className="timer-inner">{secondsToDuration(secondsRemaining)}</div>
+    </div>
+  );
+}
+
 function App() {
   const [timerStarted, setTimerStarted] = useState(false);
   const [seconds, setSeconds] = useState("");
   const [minutes, setMinutes] = useState("");
   const [hours, setHours] = useState("");
   const [totalSeconds, setTotalSeconds] = useState(0);
+  const [secondsLeft, setSecondsLeft] = useState(0);
 
   useEffect(() => {
     if (!timerStarted) {
@@ -60,8 +88,8 @@ function App() {
     }
 
     const intervalId = setInterval(() => {
-      setTotalSeconds((current) => {
-        if ( current <= 1) {
+      setSecondsLeft((current) => {
+        if (current <= 1) {
           setTimerStarted(false);
           return 0;
         }
@@ -74,59 +102,42 @@ function App() {
   }, [timerStarted]);
 
   function resetTimer() {
-    setHours('');
-    setMinutes('');
-    setSeconds('');
+    setHours("");
+    setMinutes("");
+    setSeconds("");
     setTotalSeconds(0);
+    setSecondsLeft(0);
     setTimerStarted(false);
   }
 
   function startTimer() {
     // calculate total number of seconds.
-    const totalSeconds = Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds);
+    const totalSeconds =
+      Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds);
 
     setTotalSeconds(totalSeconds);
+    setSecondsLeft(totalSeconds);
     setTimerStarted(!timerStarted);
-  }
-
-  function secondsToDuration(totalSeconds: number) {
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-
-    return `${hours.toString().padStart(2, "0")}:${minutes
-    .toString()
-    .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   }
 
   return (
     <div className="container">
       <div className="timer-input-row">
         {/* Hours */}
-        <TimerInputElement
-          value={hours}
-          setValue={setHours}
-        />
+        <TimerElement value={hours} onChange={setHours} />
 
         <Seperator />
 
         {/* Minutes */}
-        <TimerInputElement
-          value={minutes}
-          setValue={setMinutes}
-        />
+        <TimerElement value={minutes} onChange={setMinutes} />
 
         <Seperator />
 
         {/* Seconds */}
-        <TimerInputElement
-          value={seconds}
-          setValue={setSeconds}
-        />
+        <TimerElement value={seconds} onChange={setSeconds} />
 
         <PlayButton
           timerStarted={timerStarted}
-          setTimerStarted={setTimerStarted}
           startTimer={startTimer}
         />
 
@@ -135,9 +146,7 @@ function App() {
         </button>
       </div>
 
-      <p className="time-remaining">
-        {secondsToDuration(totalSeconds)}
-      </p>
+      <CircleCountdown totalSeconds={totalSeconds} secondsRemaining={secondsLeft}/>
     </div>
   );
 }

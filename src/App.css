@@ -20,7 +20,7 @@ body {
     text-align: center;
     background-color: black;
     color: white;
-    border: 1px solid rgb(55, 183, 119);;
+    border: 1px solid rgb(55, 183, 119);
 
 }
 
@@ -56,4 +56,29 @@ body {
     font-size: 80px;
     color: white;
     text-align: end;
+}
+
+.countdown-timer {
+    margin-top: 100px;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    /* conic-gradient creates the circular fill effect */
+    background: #267d52;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.timer-inner {
+  width: 120px;
+  height: 120px;
+  background: black;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: sans-serif;
+  font-size: 24px;
 }
